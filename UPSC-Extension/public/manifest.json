@@ -1,0 +1,61 @@
+{
+    "manifest_version": 3,
+    "name": "UPSC Control Room",
+    "version": "1.0.0",
+    "description": "A gamified productivity dashboard for UPSC aspirants. Block distractions, track focus, maintain streaks, and stay disciplined on your journey to LBSNAA.",
+    "author": "UPSC Control Room Team",
+    "action": {
+        "default_popup": "index.html",
+        "default_title": "UPSC Control Room",
+        "default_icon": {
+            "16": "icons/icon16.png",
+            "32": "icons/icon32.png",
+            "48": "icons/icon48.png",
+            "128": "icons/icon128.png"
+        }
+    },
+    "icons": {
+        "16": "icons/icon16.png",
+        "32": "icons/icon32.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    },
+    "permissions": [
+        "storage",
+        "tabs",
+        "alarms",
+        "notifications"
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "background": {
+        "service_worker": "background.js",
+        "type": "module"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "run_at": "document_start"
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "blocked.html",
+                "icons/*"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ],
+    "chrome_url_overrides": {
+        "newtab": "index.html"
+    }
+}
