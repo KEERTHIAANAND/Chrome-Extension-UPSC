@@ -83,9 +83,6 @@ const Journey = ({ currentXP = 0 }) => {
                     <span className="px-4 py-1.5 bg-gray-800 text-white text-[0.7rem] font-semibold rounded-full tracking-wide">
                         {formatXP(currentXP)}
                     </span>
-                    <button className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-all">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 18l6-6-6-6" /></svg>
-                    </button>
                 </div>
             </div>
 
