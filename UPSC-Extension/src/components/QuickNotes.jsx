@@ -1,14 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const QuickNotes = ({ onSave, onClear }) => {
-    const [notes, setNotes] = useState('');
+const QuickNotes = ({ notes: initialNotes = '', onSave, onClear }) => {
+    const [notes, setNotes] = useState(initialNotes);
+
+    // Sync with prop changes
+    useEffect(() => {
+        setNotes(initialNotes);
+    }, [initialNotes]);
 
     const handleSave = () => {
-        if (notes.trim() && onSave) onSave(notes);
+        if (onSave) onSave(notes);
     };
 
     const handleClear = () => {
         setNotes('');
+        if (onSave) onSave('');
         if (onClear) onClear();
     };
 
