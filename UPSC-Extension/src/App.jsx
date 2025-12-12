@@ -7,10 +7,15 @@ import {
   DailyMissions,
   StreakTimer,
   Bookmarks,
-  QuickNotes
+  QuickNotes,
+  ShareModal
 } from './components';
 
 function App() {
+  // UPSC CSE Prelims 2026 - Official Date (Same for all users)
+  // Source: UPSC Official Calendar
+  const UPSC_PRELIMS_2026 = new Date('2026-05-24');
+
   // User data - empty defaults
   const [user, setUser] = useState({
     name: '',
@@ -25,11 +30,50 @@ function App() {
     }
   });
 
-  // Quote - can be fetched from API later
-  const [quote] = useState({
-    text: '',
-    author: ''
-  });
+  // Inspirational quotes from Indian leaders - changes daily
+  const INDIAN_QUOTES = [
+    { text: "You must be the change you wish to see in the world.", author: "Mahatma Gandhi" },
+    { text: "In a gentle way, you can shake the world.", author: "Mahatma Gandhi" },
+    { text: "The best way to find yourself is to lose yourself in the service of others.", author: "Mahatma Gandhi" },
+    { text: "Strength does not come from physical capacity. It comes from an indomitable will.", author: "Mahatma Gandhi" },
+    { text: "We are what our thoughts have made us; so take care about what you think.", author: "Swami Vivekananda" },
+    { text: "Arise, awake, and stop not till the goal is reached.", author: "Swami Vivekananda" },
+    { text: "Take up one idea. Make that one idea your life.", author: "Swami Vivekananda" },
+    { text: "All power is within you; you can do anything and everything.", author: "Swami Vivekananda" },
+    { text: "You have to dream before your dreams can come true.", author: "Dr. A.P.J. Abdul Kalam" },
+    { text: "Don't take rest after your first victory because if you fail in second, more lips are waiting to say that your first victory was just luck.", author: "Dr. A.P.J. Abdul Kalam" },
+    { text: "Excellence is a continuous process and not an accident.", author: "Dr. A.P.J. Abdul Kalam" },
+    { text: "If you want to shine like a sun, first burn like a sun.", author: "Dr. A.P.J. Abdul Kalam" },
+    { text: "Freedom is not worth having if it does not include the freedom to make mistakes.", author: "Mahatma Gandhi" },
+    { text: "Swaraj is my birthright, and I shall have it.", author: "Bal Gangadhar Tilak" },
+    { text: "Give me blood, and I shall give you freedom.", author: "Subhas Chandra Bose" },
+    { text: "One individual may die for an idea, but that idea will, after his death, incarnate itself in a thousand lives.", author: "Subhas Chandra Bose" },
+    { text: "Inquilab Zindabad!", author: "Bhagat Singh" },
+    { text: "They may kill me, but they cannot kill my ideas.", author: "Bhagat Singh" },
+    { text: "The fragrance of flowers spreads only in the direction of the wind. But the goodness of a person spreads in all directions.", author: "Chanakya" },
+    { text: "Education is the best friend. An educated person is respected everywhere.", author: "Chanakya" },
+    { text: "A person should not be too honest. Straight trees are cut first.", author: "Chanakya" },
+    { text: "The secret of success is to be ready when your opportunity comes.", author: "Benjamin Disraeli (via Sardar Patel)" },
+    { text: "Every Indian should now forget that he is a Rajput, a Sikh or a Jat. He must remember that he is an Indian.", author: "Sardar Vallabhbhai Patel" },
+    { text: "Faith is the bird that feels the light when the dawn is still dark.", author: "Rabindranath Tagore" },
+    { text: "Where the mind is without fear and the head is held high.", author: "Rabindranath Tagore" },
+    { text: "The highest education is that which does not merely give us information but makes our life in harmony with all existence.", author: "Rabindranath Tagore" },
+    { text: "I measure the progress of a community by the degree of progress which women have achieved.", author: "Dr. B.R. Ambedkar" },
+    { text: "Cultivation of mind should be the ultimate aim of human existence.", author: "Dr. B.R. Ambedkar" },
+    { text: "Life should be great rather than long.", author: "Dr. B.R. Ambedkar" },
+    { text: "A country's greatness lies in its undying ideals of love and sacrifice.", author: "Sarojini Naidu" },
+    { text: "Self-confidence is the first requisite to great undertakings.", author: "Jawaharlal Nehru" }
+  ];
+
+  // Get quote for today - Day 1 = Quote 1, Day 12 = Quote 12, etc.
+  const getDailyQuote = () => {
+    const today = new Date();
+    const dayOfMonth = today.getDate(); // 1-31
+    // Array is 0-indexed, so day 1 = index 0, day 12 = index 11
+    return INDIAN_QUOTES[dayOfMonth - 1] || INDIAN_QUOTES[0];
+  };
+
+  const [quote, setQuote] = useState(() => getDailyQuote());
 
   // Stats - empty defaults
   const [stats, setStats] = useState({
@@ -41,8 +85,13 @@ function App() {
   // Streak
   const [streak, setStreak] = useState(0);
 
-  // Days to exam - empty default
-  const [daysToExam, setDaysToExam] = useState(0);
+  // Days to exam - calculated from hardcoded date
+  const [daysToExam, setDaysToExam] = useState(() => {
+    const today = new Date();
+    const diffTime = UPSC_PRELIMS_2026.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : 0;
+  });
 
   // Missions
   const [missions, setMissions] = useState([]);
@@ -59,7 +108,7 @@ function App() {
       // Check if running as Chrome extension
       if (typeof chrome !== 'undefined' && chrome.storage) {
         chrome.storage.local.get([
-          'user', 'stats', 'missions', 'bookmarks', 'notes', 'examDate'
+          'user', 'stats', 'missions', 'bookmarks', 'notes'
         ], (data) => {
           if (data.user) {
             // Sync XP from stats if available
@@ -76,15 +125,6 @@ function App() {
           if (data.missions) setMissions(data.missions);
           if (data.bookmarks) setBookmarks(data.bookmarks);
           if (data.notes) setNotes(data.notes);
-
-          // Calculate days to exam
-          if (data.examDate) {
-            const examDate = new Date(data.examDate);
-            const today = new Date();
-            const diffTime = examDate.getTime() - today.getTime();
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            setDaysToExam(diffDays > 0 ? diffDays : 0);
-          }
         });
       }
     };
@@ -108,7 +148,38 @@ function App() {
       }
     }, 30000);
 
-    return () => clearInterval(refreshInterval);
+    // Update days countdown at midnight
+    const updateDaysAtMidnight = () => {
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+      const msUntilMidnight = tomorrow.getTime() - now.getTime();
+
+      // Set timeout to update at midnight
+      const midnightTimeout = setTimeout(() => {
+        // Update days countdown
+        const today = new Date();
+        const diffTime = UPSC_PRELIMS_2026.getTime() - today.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        setDaysToExam(diffDays > 0 ? diffDays : 0);
+
+        // Update daily quote
+        setQuote(getDailyQuote());
+
+        // Set up next midnight update
+        updateDaysAtMidnight();
+      }, msUntilMidnight);
+
+      return midnightTimeout;
+    };
+
+    const midnightTimeout = updateDaysAtMidnight();
+
+    return () => {
+      clearInterval(refreshInterval);
+      clearTimeout(midnightTimeout);
+    };
   }, []);
 
   // Save data to Chrome Storage using message passing
@@ -122,22 +193,47 @@ function App() {
     }
   };
 
+  // Helper to add XP and update state/storage
+  const addXP = (amount) => {
+    setUser(prev => {
+      const newXP = (prev.currentXP || 0) + amount;
+      const newUser = { ...prev, currentXP: newXP };
+
+      // Sync with storage
+      saveToStorage('saveUser', { user: newUser });
+      return newUser;
+    });
+  };
+
   const handleAddMission = (mission) => {
-    const newMissions = [...missions, { ...mission, id: Date.now(), completed: false }];
+    const newMissions = [...missions, { ...mission, id: Date.now() }];
     setMissions(newMissions);
     saveToStorage('saveMissions', { missions: newMissions });
   };
 
-  const handleToggleMission = (id) => {
-    const newMissions = missions.map(m =>
-      m.id === id ? { ...m, completed: !m.completed } : m
-    );
+  const handleCompleteTask = (id) => {
+    // Remove the completed task from the list
+    const newMissions = missions.filter(m => m.id !== id);
     setMissions(newMissions);
     saveToStorage('saveMissions', { missions: newMissions });
+
+    // Award +50 XP
+    addXP(50);
+  };
+
+  const handleTimerComplete = () => {
+    // Award +25 XP for Pomodoro cycle
+    addXP(25);
   };
 
   const handleAddBookmark = (bookmark) => {
     const newBookmarks = [...bookmarks, { ...bookmark, id: Date.now() }];
+    setBookmarks(newBookmarks);
+    saveToStorage('saveBookmarks', { bookmarks: newBookmarks });
+  };
+
+  const handleRemoveBookmark = (id) => {
+    const newBookmarks = bookmarks.filter(b => b.id !== id);
     setBookmarks(newBookmarks);
     saveToStorage('saveBookmarks', { bookmarks: newBookmarks });
   };
@@ -147,9 +243,12 @@ function App() {
     saveToStorage('saveNotes', { notes: newNotes });
   };
 
+  // Share modal state
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
   return (
     <div className="flex min-h-screen">
-      <Sidebar user={user} />
+      <Sidebar user={user} onShare={() => setIsShareModalOpen(true)} />
       <main className="flex-1 flex flex-col overflow-hidden">
         <Header quote={quote} daysToExam={daysToExam} streak={streak} />
         <div className="flex-1 p-6 flex flex-col gap-6 overflow-y-auto">
@@ -161,18 +260,32 @@ function App() {
             <DailyMissions
               missions={missions}
               onAddMission={handleAddMission}
-              onToggleMission={handleToggleMission}
+              onCompleteTask={handleCompleteTask}
             />
-            <StreakTimer streak={streak} initialMinutes={25} />
+            <StreakTimer
+              streak={streak}
+              initialMinutes={25}
+              onTimerComplete={handleTimerComplete}
+            />
           </div>
 
           {/* Bookmarks and Quick Notes */}
           <div className="grid grid-cols-[1.5fr_1fr] gap-6">
-            <Bookmarks bookmarks={bookmarks} onAddBookmark={handleAddBookmark} />
+            <Bookmarks bookmarks={bookmarks} onAddBookmark={handleAddBookmark} onRemoveBookmark={handleRemoveBookmark} />
             <QuickNotes notes={notes} onSave={handleSaveNotes} />
           </div>
         </div>
       </main>
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        user={user}
+        stats={stats}
+        streak={streak}
+        quote={quote}
+      />
     </div>
   );
 }
