@@ -93,6 +93,17 @@ function App() {
     return diffDays > 0 ? diffDays : 0;
   });
 
+  // UPSC CSE Mains 2026 - Official Date (August 21, 2026)
+  const UPSC_MAINS_2026 = new Date('2026-08-21');
+
+  // Days to Mains - calculated from estimated date
+  const [daysToMains, setDaysToMains] = useState(() => {
+    const today = new Date();
+    const diffTime = UPSC_MAINS_2026.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : 0;
+  });
+
   // Missions
   const [missions, setMissions] = useState([]);
 
@@ -250,7 +261,7 @@ function App() {
     <div className="flex min-h-screen">
       <Sidebar user={user} onShare={() => setIsShareModalOpen(true)} />
       <main className="flex-1 flex flex-col overflow-hidden">
-        <Header quote={quote} daysToExam={daysToExam} streak={streak} />
+        <Header quote={quote} daysToExam={daysToExam} daysToMains={daysToMains} streak={streak} />
         <div className="flex-1 p-6 flex flex-col gap-6 overflow-y-auto">
           <Journey currentXP={user.currentXP} />
           <StatsCards stats={stats} />
