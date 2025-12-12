@@ -298,6 +298,49 @@ async function checkAndBlockSite(tabId, url) {
 
 // Track total focus time
 let lastFocusUpdate = Date.now();
+let isBrowserActive = true;
+let isBrowserFocused = true;
+
+// Track browser window state
+chrome.windows.onCreated.addListener(() => {
+    isBrowserActive = true;
+    chrome.storage.local.set({ browserActive: true });
+});
+
+chrome.windows.onRemoved.addListener(async () => {
+    // Check if any windows remain
+    const windows = await chrome.windows.getAll();
+    if (windows.length === 0) {
+        isBrowserActive = false;
+        isBrowserFocused = false;
+        chrome.storage.local.set({ browserActive: false, browserFocused: false });
+    }
+});
+
+// Track when user switches away from browser (loses focus)
+chrome.windows.onFocusChanged.addListener((windowId) => {
+    if (windowId === chrome.windows.WINDOW_ID_NONE) {
+        // User switched to another app - browser lost focus
+        isBrowserFocused = false;
+        chrome.storage.local.set({ browserFocused: false });
+    } else {
+        // Browser window is focused
+        isBrowserFocused = true;
+        chrome.storage.local.set({ browserFocused: true });
+    }
+});
+
+// Check browser state on startup
+chrome.windows.getAll().then(async windows => {
+    isBrowserActive = windows.length > 0;
+    // Check if any window is focused
+    const focusedWindow = await chrome.windows.getLastFocused();
+    isBrowserFocused = focusedWindow && focusedWindow.focused;
+    chrome.storage.local.set({
+        browserActive: isBrowserActive,
+        browserFocused: isBrowserFocused
+    });
+});
 
 // Update focus time every minute
 chrome.alarms.create('updateFocusTime', { periodInMinutes: 1 });
@@ -309,10 +352,25 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 });
 
 async function updateFocusTime() {
+    // Re-check browser windows to be safe
+    const windows = await chrome.windows.getAll();
+    const browserOpen = windows.length > 0;
+
+    // Check if browser is in focus (user actively using it)
+    let browserInFocus = false;
+    if (browserOpen) {
+        try {
+            const focusedWindow = await chrome.windows.getLastFocused();
+            browserInFocus = focusedWindow && focusedWindow.focused;
+        } catch (e) {
+            browserInFocus = false;
+        }
+    }
+
     const data = await chrome.storage.local.get(['stats', 'isBlocking', 'focusMinutesBuffer']);
 
-    // Only count focus time when blocking is active
-    if (data.isBlocking) {
+    // Only count focus time when blocking is active AND browser is open AND focused
+    if (data.isBlocking && browserOpen && browserInFocus) {
         const stats = data.stats || {};
         let buffer = data.focusMinutesBuffer || 0;
 
