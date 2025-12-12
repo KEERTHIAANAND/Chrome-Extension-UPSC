@@ -85,24 +85,39 @@ function App() {
   // Streak
   const [streak, setStreak] = useState(0);
 
-  // Days to exam - calculated from hardcoded date
-  const [daysToExam, setDaysToExam] = useState(() => {
-    const today = new Date();
-    const diffTime = UPSC_PRELIMS_2026.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays > 0 ? diffDays : 0;
-  });
-
   // UPSC CSE Mains 2026 - Official Date (August 21, 2026)
   const UPSC_MAINS_2026 = new Date('2026-08-21');
 
-  // Days to Mains - calculated from estimated date
-  const [daysToMains, setDaysToMains] = useState(() => {
-    const today = new Date();
-    const diffTime = UPSC_MAINS_2026.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays > 0 ? diffDays : 0;
-  });
+  // Days to exam - calculated dynamically
+  const calculateDays = (targetDate) => {
+    const now = new Date();
+    // Reset both dates to midnight for accurate day comparison
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const target = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+    const diff = target.getTime() - today.getTime();
+    const days = Math.round(diff / (1000 * 60 * 60 * 24));
+    return days > 0 ? days : 0;
+  };
+
+  const [daysToExam, setDaysToExam] = useState(() => calculateDays(UPSC_PRELIMS_2026));
+  const [daysToMains, setDaysToMains] = useState(() => calculateDays(UPSC_MAINS_2026));
+
+  // Function to calculate days remaining (for interval updates)
+  const calculateDaysRemaining = () => {
+    setDaysToExam(calculateDays(UPSC_PRELIMS_2026));
+    setDaysToMains(calculateDays(UPSC_MAINS_2026));
+  };
+
+  // Update countdown on mount and every hour
+  useEffect(() => {
+    // Calculate immediately
+    calculateDaysRemaining();
+
+    // Update every hour (in case user keeps extension open overnight)
+    const interval = setInterval(calculateDaysRemaining, 60 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // Missions
   const [missions, setMissions] = useState([]);
