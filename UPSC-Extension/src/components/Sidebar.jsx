@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Sidebar = ({ user }) => {
+const Sidebar = ({ user, onShare }) => {
     const xpPercentage = (user.currentXP / user.targetXP) * 100;
 
     return (
@@ -75,6 +75,7 @@ const Sidebar = ({ user }) => {
 
             {/* Share Button */}
             <button
+                onClick={onShare}
                 className="flex items-center justify-center gap-2 w-full py-3.5 px-4 text-white text-xs font-bold tracking-widest rounded-lg cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg mt-auto"
                 style={{ fontFamily: 'Outfit, sans-serif', background: 'linear-gradient(135deg, #1a3a6b, #0f2444)' }}
             >
