@@ -24,24 +24,28 @@ const StatsCards = ({ stats }) => {
                 </div>
             </div>
 
-            {/* Focus Breaches */}
+            {/* Total Focus Time */}
             <div className="bg-white rounded-2xl p-5 shadow-lg relative overflow-hidden transition-all hover:-translate-y-1 hover:shadow-xl">
-                <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(90deg, #f59e0b, #fbbf24)' }}></div>
+                <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: 'linear-gradient(90deg, #10b981, #34d399)' }}></div>
                 <div className="flex justify-between items-start mb-4">
-                    <div className="w-11 h-11 rounded-lg flex items-center justify-center" style={{ background: 'rgba(245,158,11,0.1)', color: '#f59e0b' }}>
+                    <div className="w-11 h-11 rounded-lg flex items-center justify-center" style={{ background: 'rgba(16,185,129,0.1)', color: '#10b981' }}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <polygon points="12 2 2 7 12 12 22 7 12 2" />
-                            <polyline points="2 17 12 22 22 17" />
-                            <polyline points="2 12 12 17 22 12" />
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
                         </svg>
                     </div>
                 </div>
-                <span className="text-4xl font-bold block mb-1" style={{ fontFamily: 'Outfit, sans-serif', color: '#f59e0b' }}>{stats.focusBreaches}</span>
-                <span className="text-sm font-medium text-gray-600">Focus Breaches</span>
+                <span className="text-4xl font-bold block mb-1" style={{ fontFamily: 'Outfit, sans-serif', color: '#10b981' }}>
+                    {stats.totalFocusMinutes >= 60
+                        ? `${Math.floor(stats.totalFocusMinutes / 60)}h ${stats.totalFocusMinutes % 60}m`
+                        : `${stats.totalFocusMinutes || 0}m`
+                    }
+                </span>
+                <span className="text-sm font-medium text-gray-600">Total Focus Time</span>
                 <div className="mt-4">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[0.65rem] font-semibold tracking-wide uppercase" style={{ background: 'rgba(245,158,11,0.1)', color: '#d97706' }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
-                        TAB SWITCHES DETECTED
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[0.65rem] font-semibold tracking-wide uppercase" style={{ background: 'rgba(16,185,129,0.1)', color: '#059669' }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                        DEEP WORK TRACKED
                     </span>
                 </div>
             </div>
