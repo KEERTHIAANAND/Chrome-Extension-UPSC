@@ -108,6 +108,10 @@
       color: #ff9933;
     }
 
+    .stat-value.penalty {
+      color: #ef4444;
+    }
+
     .stat-label {
       font-size: 0.85rem;
       color: rgba(255, 255, 255, 0.7);
@@ -159,11 +163,15 @@
     <div class="stats">
       <div class="stat">
         <div class="stat-value" id="blockedCount">0</div>
-        <div class="stat-label">Distractions Blocked Today</div>
+        <div class="stat-label">Distractions Blocked</div>
       </div>
       <div class="stat">
-        <div class="stat-value" id="xpEarned">+10</div>
-        <div class="stat-label">XP Earned</div>
+        <div class="stat-value penalty">-5</div>
+        <div class="stat-label">XP Penalty</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="disciplineScore">100%</div>
+        <div class="stat-label">Discipline Score</div>
       </div>
     </div>
 
