@@ -41,7 +41,35 @@ const Journey = ({ currentXP = 0 }) => {
     };
 
     const currentStageIndex = getCurrentStageIndex();
-    const progressPercent = ((currentStageIndex + 0.5) / journeyStages.length) * 100;
+
+    // Calculate precise progress percentage for the bar
+    const calculateProgress = () => {
+        if (currentXP === 0) return 0; // Explicit Zeroth Condition
+
+        // Safe check for max stage
+        if (currentStageIndex >= journeyStages.length - 1) return 100;
+
+        const currentStage = journeyStages[currentStageIndex];
+        const nextStage = journeyStages[currentStageIndex + 1];
+
+        // XP range for this specific stage gap
+        const stageRange = nextStage.xpThreshold - currentStage.xpThreshold;
+
+        // XP earned within this stage
+        const xpInStage = Math.max(0, currentXP - currentStage.xpThreshold);
+
+        // Percentage completion of THIS stage (0 to 1)
+        const stageProgress = stageRange > 0 ? xpInStage / stageRange : 0;
+
+        // Map to total timeline width
+        const segmentWidth = 100 / (journeyStages.length - 1);
+        const baseProgress = currentStageIndex * segmentWidth;
+        const addedProgress = stageProgress * segmentWidth;
+
+        return Math.min(100, Math.max(0, baseProgress + addedProgress));
+    };
+
+    const progressPercent = calculateProgress();
 
     return (
         <div className="bg-white rounded-2xl p-5 shadow-lg">
