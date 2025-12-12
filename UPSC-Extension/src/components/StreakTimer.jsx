@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const StreakTimer = ({ streak, initialMinutes = 25, breakMinutes = 5 }) => {
+const StreakTimer = ({ streak, initialMinutes = 25, breakMinutes = 5, onTimerComplete }) => {
     const [isBreakMode, setIsBreakMode] = useState(false);
     const [timeLeft, setTimeLeft] = useState(initialMinutes * 60);
     const [isRunning, setIsRunning] = useState(false);
@@ -9,9 +9,16 @@ const StreakTimer = ({ streak, initialMinutes = 25, breakMinutes = 5 }) => {
         let interval;
         if (isRunning && timeLeft > 0) {
             interval = setInterval(() => setTimeLeft(t => t - 1), 1000);
+        } else if (timeLeft === 0 && isRunning) {
+            setIsRunning(false);
+            if (!isBreakMode && onTimerComplete) {
+                onTimerComplete();
+                // Play a success sound or notification here could be nice, but keeping it simple
+                alert("Focus Session Complete! +25 XP"); // Simple feedback
+            }
         }
         return () => clearInterval(interval);
-    }, [isRunning, timeLeft]);
+    }, [isRunning, timeLeft, isBreakMode, onTimerComplete]);
 
     const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
