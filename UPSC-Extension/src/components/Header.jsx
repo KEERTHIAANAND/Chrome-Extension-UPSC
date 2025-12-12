@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Header = ({ quote, daysToExam, streak }) => {
+const Header = ({ quote, daysToExam, daysToMains, streak }) => {
     return (
         <header className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200 gap-8">
             {/* Motivational Quote */}
@@ -30,10 +30,10 @@ const Header = ({ quote, daysToExam, streak }) => {
 
             {/* Stats */}
             <div className="flex items-center gap-4">
-                {/* Days Counter */}
-                <div className="flex items-center gap-3 px-5 py-3 border rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-md" style={{ background: 'linear-gradient(135deg, rgba(26,58,107,0.05), rgba(26,58,107,0.02))', borderColor: 'rgba(26,58,107,0.1)' }}>
-                    <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white" style={{ background: '#1a3a6b' }}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                {/* Prelims Days Counter */}
+                <div className="flex items-center gap-3 px-4 py-3 border rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-md" style={{ background: 'linear-gradient(135deg, rgba(26,58,107,0.05), rgba(26,58,107,0.02))', borderColor: 'rgba(26,58,107,0.1)' }}>
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white" style={{ background: '#1a3a6b' }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                             <line x1="16" y1="2" x2="16" y2="6" />
                             <line x1="8" y1="2" x2="8" y2="6" />
@@ -41,8 +41,24 @@ const Header = ({ quote, daysToExam, streak }) => {
                         </svg>
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-base font-bold" style={{ fontFamily: 'Outfit, sans-serif', color: '#1a3a6b' }}>-{daysToExam} Days</span>
-                        <span className="text-[0.6rem] font-semibold text-gray-500 tracking-wide uppercase">TO PRELIMS 2026</span>
+                        <span className="text-sm font-bold" style={{ fontFamily: 'Outfit, sans-serif', color: '#1a3a6b' }}>-{daysToExam} Days</span>
+                        <span className="text-[0.55rem] font-semibold text-gray-500 tracking-wide uppercase">PRELIMS 2026</span>
+                    </div>
+                </div>
+
+                {/* Mains Days Counter */}
+                <div className="flex items-center gap-3 px-4 py-3 border rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-md" style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.05), rgba(16,185,129,0.02))', borderColor: 'rgba(16,185,129,0.1)' }}>
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white" style={{ background: '#10b981' }}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                        </svg>
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-sm font-bold" style={{ fontFamily: 'Outfit, sans-serif', color: '#10b981' }}>-{daysToMains} Days</span>
+                        <span className="text-[0.55rem] font-semibold text-gray-500 tracking-wide uppercase">MAINS 2026</span>
                     </div>
                 </div>
 
