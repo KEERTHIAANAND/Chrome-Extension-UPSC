@@ -11,14 +11,20 @@ const Header = ({ quote, daysToExam, streak }) => {
                     </svg>
                 </div>
                 <div className="flex-1">
-                    <p className="text-base font-medium italic text-gray-700 mb-2 leading-relaxed" style={{ fontFamily: 'Outfit, sans-serif' }}>"{quote.text}"</p>
-                    <div className="flex items-center gap-4">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[0.65rem] font-bold tracking-wider" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#16a34a' }}>
-                            <span className="text-sm">🌿</span>
-                            WISDOM
-                        </span>
-                        <span className="text-sm font-semibold uppercase tracking-wide" style={{ color: '#1a3a6b' }}>— {quote.author}</span>
-                    </div>
+                    {quote.text ? (
+                        <>
+                            <p className="text-base font-medium italic text-gray-700 mb-2 leading-relaxed" style={{ fontFamily: 'Outfit, sans-serif' }}>"{quote.text}"</p>
+                            <div className="flex items-center gap-4">
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[0.65rem] font-bold tracking-wider" style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#16a34a' }}>
+                                    <span className="text-sm">🌿</span>
+                                    WISDOM
+                                </span>
+                                <span className="text-sm font-semibold uppercase tracking-wide" style={{ color: '#1a3a6b' }}>— {quote.author}</span>
+                            </div>
+                        </>
+                    ) : (
+                        <p className="text-sm text-gray-400 italic">Add a motivational quote to inspire your journey</p>
+                    )}
                 </div>
             </div>
 
