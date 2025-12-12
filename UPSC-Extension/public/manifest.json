@@ -24,7 +24,9 @@
         "storage",
         "tabs",
         "alarms",
-        "notifications"
+        "notifications",
+        "contextMenus",
+        "downloads"
     ],
     "host_permissions": [
         "<all_urls>"
@@ -32,6 +34,15 @@
     "background": {
         "service_worker": "background.js",
         "type": "module"
+    },
+    "commands": {
+        "bookmark-page": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+S",
+                "mac": "Command+Shift+S"
+            },
+            "description": "Bookmark current page to UPSC Control Room"
+        }
     },
     "content_scripts": [
         {
@@ -48,6 +59,7 @@
         {
             "resources": [
                 "blocked.html",
+                "blocked.js",
                 "icons/*"
             ],
             "matches": [

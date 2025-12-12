@@ -6,3 +6,4 @@ export { default as DailyMissions } from './DailyMissions';
 export { default as StreakTimer } from './StreakTimer';
 export { default as Bookmarks } from './Bookmarks';
 export { default as QuickNotes } from './QuickNotes';
+export { default as ShareModal } from './ShareModal';
