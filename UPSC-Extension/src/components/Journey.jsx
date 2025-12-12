@@ -1,13 +1,21 @@
 import React from 'react';
 
+// XP thresholds for each stage
+const XP_THRESHOLDS = [0, 1500, 5000, 10000, 20000, 50000];
+
 const journeyStages = [
-    { id: 1, name: 'Foundation', xp: '0 XP', icon: 'foundation', completed: true },
-    { id: 2, name: 'NCERTs', xp: '1.5K XP', icon: 'ncert', completed: true },
-    { id: 3, name: 'Prelims Ready', xp: '5K XP', icon: 'prelims', current: true },
-    { id: 4, name: 'Mains Mastery', xp: '10K XP', icon: 'mains', completed: false },
-    { id: 5, name: 'Interview', xp: '20K XP', icon: 'interview', completed: false },
-    { id: 6, name: 'LBSNAA', xp: 'RANK 1', icon: 'lbsnaa', completed: false },
+    { id: 1, name: 'Foundation', xpThreshold: 0, icon: 'foundation' },
+    { id: 2, name: 'NCERTs', xpThreshold: 1500, icon: 'ncert' },
+    { id: 3, name: 'Prelims Ready', xpThreshold: 5000, icon: 'prelims' },
+    { id: 4, name: 'Mains Mastery', xpThreshold: 10000, icon: 'mains' },
+    { id: 5, name: 'Interview', xpThreshold: 20000, icon: 'interview' },
+    { id: 6, name: 'LBSNAA', xpThreshold: 50000, icon: 'lbsnaa' },
 ];
+
+const formatXP = (xp) => {
+    if (xp >= 1000) return `${(xp / 1000).toFixed(1)}K XP`;
+    return `${xp} XP`;
+};
 
 const StageIcon = ({ type }) => {
     const icons = {
@@ -21,9 +29,19 @@ const StageIcon = ({ type }) => {
     return icons[type] || null;
 };
 
-const Journey = () => {
-    const currentIndex = journeyStages.findIndex(s => s.current);
-    const progressPercent = ((currentIndex + 0.5) / journeyStages.length) * 100;
+const Journey = ({ currentXP = 0 }) => {
+    // Calculate current stage based on XP
+    const getCurrentStageIndex = () => {
+        for (let i = journeyStages.length - 1; i >= 0; i--) {
+            if (currentXP >= journeyStages[i].xpThreshold) {
+                return i;
+            }
+        }
+        return 0;
+    };
+
+    const currentStageIndex = getCurrentStageIndex();
+    const progressPercent = ((currentStageIndex + 0.5) / journeyStages.length) * 100;
 
     return (
         <div className="bg-white rounded-2xl p-5 shadow-lg">
@@ -34,7 +52,9 @@ const Journey = () => {
                     <p className="text-sm text-gray-500 mt-0.5">Path to LBSNAA</p>
                 </div>
                 <div className="flex items-center gap-4">
-                    <span className="px-4 py-1.5 bg-gray-800 text-white text-[0.7rem] font-semibold rounded-full tracking-wide">Current Level</span>
+                    <span className="px-4 py-1.5 bg-gray-800 text-white text-[0.7rem] font-semibold rounded-full tracking-wide">
+                        {formatXP(currentXP)}
+                    </span>
                     <button className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-all">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 18l6-6-6-6" /></svg>
                     </button>
@@ -55,10 +75,13 @@ const Journey = () => {
 
                 {/* Stages */}
                 <div className="flex justify-between relative z-[2]">
-                    {journeyStages.map((stage) => {
+                    {journeyStages.map((stage, index) => {
+                        const isCompleted = currentXP >= stage.xpThreshold && index < currentStageIndex;
+                        const isCurrent = index === currentStageIndex;
+
                         const getMarkerStyle = () => {
-                            if (stage.completed) return { background: '#1a3a6b', borderColor: '#1a3a6b', color: 'white' };
-                            if (stage.current) return { background: 'linear-gradient(135deg, #ff9933, #ff6b00)', borderColor: '#ff6b00', color: 'white', boxShadow: '0 0 0 4px rgba(255,153,51,0.25), 0 4px 12px rgba(255,107,0,0.3)' };
+                            if (isCompleted) return { background: '#1a3a6b', borderColor: '#1a3a6b', color: 'white' };
+                            if (isCurrent) return { background: 'linear-gradient(135deg, #ff9933, #ff6b00)', borderColor: '#ff6b00', color: 'white', boxShadow: '0 0 0 4px rgba(255,153,51,0.25), 0 4px 12px rgba(255,107,0,0.3)' };
                             return { background: 'white', borderColor: '#e5e7eb', color: '#9ca3af' };
                         };
 
@@ -69,8 +92,12 @@ const Journey = () => {
                                         <StageIcon type={stage.icon} />
                                     </div>
                                 </div>
-                                <span className={`text-[0.7rem] font-semibold mb-0.5 tracking-wide`} style={{ color: stage.completed ? '#1a3a6b' : stage.current ? '#ff6b00' : '#9ca3af' }}>{stage.xp}</span>
-                                <span className="text-xs font-semibold text-center max-w-[80px]" style={{ color: stage.completed ? '#4b5563' : stage.current ? '#1a3a6b' : '#9ca3af' }}>{stage.name}</span>
+                                <span className="text-[0.7rem] font-semibold mb-0.5 tracking-wide" style={{ color: isCompleted ? '#1a3a6b' : isCurrent ? '#ff6b00' : '#9ca3af' }}>
+                                    {formatXP(stage.xpThreshold)}
+                                </span>
+                                <span className="text-xs font-semibold text-center max-w-[80px]" style={{ color: isCompleted ? '#4b5563' : isCurrent ? '#1a3a6b' : '#9ca3af' }}>
+                                    {stage.name}
+                                </span>
                             </div>
                         );
                     })}
