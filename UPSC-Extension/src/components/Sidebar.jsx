@@ -1,15 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const Sidebar = ({ user, onShare }) => {
     const xpPercentage = (user.currentXP / user.targetXP) * 100;
+    const [showRules, setShowRules] = useState(false);
 
     return (
         <aside className="w-60 min-h-screen bg-gradient-to-b from-gray-50 to-white border-r border-gray-200 flex flex-col p-4">
-            {/* Header Toggle */}
-            <div className="flex items-center mb-2">
-                <button className="w-8 h-8 bg-white border border-gray-200 rounded-lg flex items-center justify-center cursor-pointer text-gray-500 hover:bg-gray-100 transition-all">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M15 18l-6-6 6-6" />
+            {/* Header with Help */}
+            <div className="flex items-center justify-end mb-2">
+                {/* Help/Rules Icon */}
+                <button
+                    onClick={() => setShowRules(true)}
+                    className="w-8 h-8 bg-white border border-gray-200 rounded-lg flex items-center justify-center cursor-pointer text-gray-500 hover:bg-orange-50 hover:text-orange-500 hover:border-orange-200 transition-all"
+                    title="Dashboard Rules"
+                >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" />
+                        <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
                     </svg>
                 </button>
             </div>
@@ -84,6 +91,113 @@ const Sidebar = ({ user, onShare }) => {
                 </svg>
                 SHARE YOUR IMPACT
             </button>
+
+            {/* Rules Modal */}
+            {showRules && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(15, 36, 68, 0.9)' }}>
+                    <div className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                        <style>{`.modal-scroll::-webkit-scrollbar { display: none; }`}</style>
+                        {/* Modal Header */}
+                        <div className="sticky top-0 bg-white border-b border-gray-100 px-5 py-4 flex items-center justify-between z-10">
+                            <div className="flex items-center gap-2">
+                                <span className="text-xl">📋</span>
+                                <h2 className="text-lg font-bold" style={{ fontFamily: 'Outfit, sans-serif', color: '#1a3a6b' }}>Dashboard Rules</h2>
+                            </div>
+                            <button
+                                onClick={() => setShowRules(false)}
+                                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-all"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                    <path d="M18 6L6 18M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        {/* Modal Content */}
+                        <div className="p-5 space-y-5">
+                            {/* Points Section */}
+                            <div>
+                                <h3 className="text-sm font-bold uppercase tracking-wide mb-3" style={{ color: '#ff6b00' }}>⚡ Points System</h3>
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100">
+                                        <span className="text-sm text-gray-700">Complete a Mission</span>
+                                        <span className="text-sm font-bold text-green-600">+50 XP</span>
+                                    </div>
+                                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100">
+                                        <span className="text-sm text-gray-700">1 Hour of Focus</span>
+                                        <span className="text-sm font-bold text-green-600">+50 XP</span>
+                                    </div>
+                                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100">
+                                        <span className="text-sm text-gray-700">Complete Pomodoro (25 min)</span>
+                                        <span className="text-sm font-bold text-green-600">+25 XP</span>
+                                    </div>
+                                    <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-100">
+                                        <span className="text-sm text-gray-700">Visit Blocked Site</span>
+                                        <span className="text-sm font-bold text-red-500">-5 XP</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Discipline Section */}
+                            <div>
+                                <h3 className="text-sm font-bold uppercase tracking-wide mb-3" style={{ color: '#ff6b00' }}>🛡️ Discipline Score</h3>
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100">
+                                        <span className="text-sm text-gray-700">1 Hour of Focus</span>
+                                        <span className="text-sm font-bold text-green-600">+0.5%</span>
+                                    </div>
+                                    <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-100">
+                                        <span className="text-sm text-gray-700">Blocked Site Attempt</span>
+                                        <span className="text-sm font-bold text-red-500">-1%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Journey Section */}
+                            <div>
+                                <h3 className="text-sm font-bold uppercase tracking-wide mb-3" style={{ color: '#ff6b00' }}>🚀 Journey Stages</h3>
+                                <div className="text-xs text-gray-600 space-y-1.5">
+                                    <div className="flex justify-between"><span>Foundation</span><span className="font-semibold">0 XP</span></div>
+                                    <div className="flex justify-between"><span>NCERTs</span><span className="font-semibold">1,500 XP</span></div>
+                                    <div className="flex justify-between"><span>Prelims Ready</span><span className="font-semibold">5,000 XP</span></div>
+                                    <div className="flex justify-between"><span>Mains Mastery</span><span className="font-semibold">10,000 XP</span></div>
+                                    <div className="flex justify-between"><span>Interview</span><span className="font-semibold">20,000 XP</span></div>
+                                    <div className="flex justify-between"><span className="font-bold" style={{ color: '#1a3a6b' }}>LBSNAA 🏛️</span><span className="font-bold" style={{ color: '#ff6b00' }}>50,000 XP</span></div>
+                                </div>
+                            </div>
+
+                            {/* Shortcuts */}
+                            <div>
+                                <h3 className="text-sm font-bold uppercase tracking-wide mb-3" style={{ color: '#ff6b00' }}>⌨️ Shortcuts</h3>
+                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <span className="text-sm text-gray-700">Quick Bookmark</span>
+                                    <kbd className="px-2 py-1 bg-gray-200 rounded text-xs font-mono font-bold text-gray-700">Ctrl+Shift+S</kbd>
+                                </div>
+                            </div>
+
+                            {/* Easter Egg - Hidden Message */}
+                            <div className="pt-4 border-t border-gray-100">
+                                <p className="text-[0.6rem] text-center text-gray-300 leading-relaxed">
+                                    Made with ❤️ for UPSC Aspirants<br />
+                                    <span className="italic">"Your dedication today shapes the nation tomorrow"</span><br />
+                                    <span className="font-semibold mt-1 block">— Keerthi Aanand</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="border-t border-gray-100 px-5 py-4">
+                            <button
+                                onClick={() => setShowRules(false)}
+                                className="w-full py-3 rounded-lg text-sm font-bold text-white transition-all hover:opacity-90"
+                                style={{ background: 'linear-gradient(135deg, #1a3a6b, #0f2444)' }}
+                            >
+                                Got it!
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </aside>
     );
 };
