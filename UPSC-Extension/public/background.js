@@ -21,27 +21,28 @@ const DEFAULT_BLOCKED_SITES = [
 chrome.runtime.onInstalled.addListener(async () => {
     const data = await chrome.storage.local.get(null);
 
-    // Initialize blocked sites
-    if (!data.blockedSites) {
-        await chrome.storage.local.set({ blockedSites: DEFAULT_BLOCKED_SITES });
-    }
+    // Always update blocked sites to include latest defaults
+    await chrome.storage.local.set({ blockedSites: DEFAULT_BLOCKED_SITES });
 
-    // Initialize stats
-    if (!data.stats) {
-        await chrome.storage.local.set({
-            stats: {
-                threatsBlocked: 0,
-                totalFocusMinutes: 0,
-                disciplineScore: 100,
-                currentStreak: 0,
-                lastActiveDate: null,
-                totalXP: 0
-            }
-        });
-    }
+    // FORCE RESET: Clear points and stats for new implementation
+    // This runs on every extension reload/update to ensure a fresh start
+    await chrome.storage.local.set({
+        stats: {
+            threatsBlocked: 0,
+            totalFocusMinutes: 0,
+            disciplineScore: 100,
+            currentStreak: 0,
+            lastActiveDate: null,
+            totalXP: 0
+        },
+        focusMinutesBuffer: 0
+    });
 
-    // Initialize user profile
-    if (!data.user) {
+    // Reset User XP
+    if (data.user) {
+        const resetUser = { ...data.user, currentXP: 0 };
+        await chrome.storage.local.set({ user: resetUser });
+    } else {
         await chrome.storage.local.set({
             user: {
                 name: 'UPSC Aspirant',
@@ -83,6 +84,13 @@ chrome.runtime.onInstalled.addListener(async () => {
         await chrome.storage.local.set({ isBlocking: true });
     }
 
+    // Create context menu for quick bookmarking
+    chrome.contextMenus.create({
+        id: 'bookmarkPage',
+        title: '⭐ Bookmark this page to UPSC Control Room',
+        contexts: ['page', 'action']
+    });
+
     console.log('UPSC Control Room initialized!');
 });
 
@@ -118,6 +126,124 @@ async function updateStreak() {
     }
 }
 
+// Context menu click handler - Bookmark current page
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+    if (info.menuItemId === 'bookmarkPage') {
+        try {
+            const data = await chrome.storage.local.get(['bookmarks']);
+            const bookmarks = data.bookmarks || [];
+
+            // Get site name from title or URL
+            const url = new URL(tab.url);
+            const siteName = tab.title ? tab.title.substring(0, 20) : url.hostname.replace('www.', '');
+
+            // Get favicon URL
+            const faviconUrl = tab.favIconUrl || null;
+
+            // Create bookmark
+            const newBookmark = {
+                id: Date.now(),
+                name: siteName,
+                url: tab.url,
+                icon: faviconUrl || '💡', // Use bulb emoji as default
+                favicon: faviconUrl
+            };
+
+            // Check if already bookmarked
+            const alreadyExists = bookmarks.some(b => b.url === tab.url);
+            if (alreadyExists) {
+                // Show notification
+                chrome.notifications.create({
+                    type: 'basic',
+                    iconUrl: 'icons/icon128.png',
+                    title: 'Already Bookmarked',
+                    message: 'This page is already in your bookmarks!'
+                });
+                return;
+            }
+
+            // Add to bookmarks
+            bookmarks.push(newBookmark);
+            await chrome.storage.local.set({ bookmarks });
+
+            // Show success notification
+            chrome.notifications.create({
+                type: 'basic',
+                iconUrl: 'icons/icon128.png',
+                title: 'Page Bookmarked! ⭐',
+                message: `"${siteName}" added to your UPSC Control Room bookmarks.`
+            });
+
+            console.log('Bookmarked:', newBookmark);
+        } catch (error) {
+            console.error('Error bookmarking page:', error);
+        }
+    }
+});
+
+// Keyboard shortcut handler (Ctrl+Shift+S)
+chrome.commands.onCommand.addListener(async (command) => {
+    if (command === 'bookmark-page') {
+        // Get current active tab
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (tab && tab.url) {
+            await bookmarkCurrentPage(tab);
+        }
+    }
+});
+
+// Shared bookmark function
+async function bookmarkCurrentPage(tab) {
+    try {
+        const data = await chrome.storage.local.get(['bookmarks']);
+        const bookmarks = data.bookmarks || [];
+
+        // Get site name from title or URL
+        const url = new URL(tab.url);
+        const siteName = tab.title ? tab.title.substring(0, 20) : url.hostname.replace('www.', '');
+
+        // Get favicon URL
+        const faviconUrl = tab.favIconUrl || null;
+
+        // Create bookmark
+        const newBookmark = {
+            id: Date.now(),
+            name: siteName,
+            url: tab.url,
+            icon: faviconUrl || '💡',
+            favicon: faviconUrl
+        };
+
+        // Check if already bookmarked
+        const alreadyExists = bookmarks.some(b => b.url === tab.url);
+        if (alreadyExists) {
+            chrome.notifications.create({
+                type: 'basic',
+                iconUrl: 'icons/icon128.png',
+                title: 'Already Bookmarked',
+                message: 'This page is already in your bookmarks!'
+            });
+            return;
+        }
+
+        // Add to bookmarks
+        bookmarks.push(newBookmark);
+        await chrome.storage.local.set({ bookmarks });
+
+        // Show success notification
+        chrome.notifications.create({
+            type: 'basic',
+            iconUrl: 'icons/icon128.png',
+            title: 'Page Bookmarked! ⭐',
+            message: `"${siteName}" added to your UPSC Control Room bookmarks.`
+        });
+
+        console.log('Bookmarked via shortcut:', newBookmark);
+    } catch (error) {
+        console.error('Error bookmarking page:', error);
+    }
+}
+
 // Listen for tab updates to block distracting sites
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     if (changeInfo.url) {
@@ -144,7 +270,11 @@ async function checkAndBlockSite(tabId, url) {
         if (isBlocked) {
             // Increment threats blocked
             stats.threatsBlocked = (stats.threatsBlocked || 0) + 1;
-            stats.totalXP = (stats.totalXP || 0) + 10; // +10 XP for blocking distraction
+            stats.totalXP = Math.max(0, (stats.totalXP || 0) - 5); // -5 XP penalty (floor at 0)
+
+            // Discipline Penalty: -1%
+            stats.disciplineScore = Math.max(0, (stats.disciplineScore || 100) - 1);
+
             await chrome.storage.local.set({ stats });
 
             // Redirect to blocked page
@@ -156,8 +286,8 @@ async function checkAndBlockSite(tabId, url) {
             chrome.notifications.create({
                 type: 'basic',
                 iconUrl: 'icons/icon128.png',
-                title: '🛡️ Distraction Blocked!',
-                message: `${hostname} was blocked. Stay focused on your UPSC preparation!`,
+                title: '⚠️ Distraction Penalty',
+                message: `${hostname} blocked (-5 XP, -1% Discipline). Stay disciplined!`,
                 priority: 2
             });
         }
@@ -167,7 +297,6 @@ async function checkAndBlockSite(tabId, url) {
 }
 
 // Track total focus time
-let focusStartTime = Date.now();
 let lastFocusUpdate = Date.now();
 
 // Update focus time every minute
@@ -180,14 +309,39 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 });
 
 async function updateFocusTime() {
-    const data = await chrome.storage.local.get(['stats', 'isBlocking']);
+    const data = await chrome.storage.local.get(['stats', 'isBlocking', 'focusMinutesBuffer']);
 
     // Only count focus time when blocking is active
     if (data.isBlocking) {
         const stats = data.stats || {};
+        let buffer = data.focusMinutesBuffer || 0;
+
+        // Increment buffer
+        buffer += 1;
         stats.totalFocusMinutes = (stats.totalFocusMinutes || 0) + 1;
-        stats.totalXP = (stats.totalXP || 0) + 2; // +2 XP per minute of focus
-        await chrome.storage.local.set({ stats });
+
+        // Check if 1 hour (60 minutes) reached
+        if (buffer >= 60) {
+            stats.totalXP = (stats.totalXP || 0) + 50; // +50 XP per hour
+
+            // Discipline Reward: +0.5%
+            // Use parseFloat to handle potential string storage issues and ensure math correct
+            const currentScore = parseFloat(stats.disciplineScore || 0);
+            stats.disciplineScore = Math.min(100, currentScore + 0.5);
+
+            buffer = 0; // Reset buffer
+
+            // Notification for hourly streak
+            chrome.notifications.create({
+                type: 'basic',
+                iconUrl: 'icons/icon128.png',
+                title: '🔥 Hourly Focus Bonus!',
+                message: '1 Hour of focus complete. +50 XP & +0.5% Discipline awarded!',
+                priority: 1
+            });
+        }
+
+        await chrome.storage.local.set({ stats, focusMinutesBuffer: buffer });
     }
 
     lastFocusUpdate = Date.now();
