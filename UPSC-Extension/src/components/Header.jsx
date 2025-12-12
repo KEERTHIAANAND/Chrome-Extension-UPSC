@@ -42,7 +42,7 @@ const Header = ({ quote, daysToExam, streak }) => {
                     </div>
                     <div className="flex flex-col">
                         <span className="text-base font-bold" style={{ fontFamily: 'Outfit, sans-serif', color: '#1a3a6b' }}>-{daysToExam} Days</span>
-                        <span className="text-[0.6rem] font-semibold text-gray-500 tracking-wide uppercase">TO PRELIMS 2025</span>
+                        <span className="text-[0.6rem] font-semibold text-gray-500 tracking-wide uppercase">TO PRELIMS 2026</span>
                     </div>
                 </div>
 
