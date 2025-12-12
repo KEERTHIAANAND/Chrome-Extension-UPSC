@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +12,7 @@
       padding: 0;
       box-sizing: border-box;
     }
-    
+
     body {
       font-family: 'Outfit', sans-serif;
       background: linear-gradient(135deg, #1a3a6b 0%, #0f2444 100%);
@@ -21,24 +22,31 @@
       justify-content: center;
       color: white;
     }
-    
+
     .container {
       text-align: center;
       padding: 3rem;
       max-width: 600px;
     }
-    
+
     .shield {
       font-size: 80px;
       margin-bottom: 1.5rem;
       animation: pulse 2s ease-in-out infinite;
     }
-    
+
     @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
     }
-    
+
     h1 {
       font-size: 2.5rem;
       font-weight: 700;
@@ -48,13 +56,13 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    
+
     .subtitle {
       font-size: 1.25rem;
       color: rgba(255, 255, 255, 0.9);
       margin-bottom: 2rem;
     }
-    
+
     .quote-box {
       background: rgba(255, 255, 255, 0.1);
       border-radius: 16px;
@@ -63,48 +71,48 @@
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
-    
+
     .quote {
       font-size: 1.1rem;
       font-style: italic;
       color: #ff9933;
       margin-bottom: 0.5rem;
     }
-    
+
     .author {
       font-size: 0.9rem;
       color: rgba(255, 255, 255, 0.7);
     }
-    
+
     .message {
       font-size: 1rem;
       color: rgba(255, 255, 255, 0.8);
       line-height: 1.6;
       margin-bottom: 2rem;
     }
-    
+
     .stats {
       display: flex;
       justify-content: center;
       gap: 2rem;
       margin-bottom: 2rem;
     }
-    
+
     .stat {
       text-align: center;
     }
-    
+
     .stat-value {
       font-size: 2rem;
       font-weight: 700;
       color: #ff9933;
     }
-    
+
     .stat-label {
       font-size: 0.85rem;
       color: rgba(255, 255, 255, 0.7);
     }
-    
+
     .btn {
       display: inline-block;
       padding: 1rem 2rem;
@@ -118,12 +126,12 @@
       border: none;
       cursor: pointer;
     }
-    
+
     .btn:hover {
       transform: translateY(-3px);
       box-shadow: 0 10px 30px rgba(255, 107, 0, 0.4);
     }
-    
+
     .timer {
       margin-top: 1.5rem;
       font-size: 0.9rem;
@@ -131,22 +139,23 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="shield">🛡️</div>
     <h1>Distraction Blocked!</h1>
     <p class="subtitle">Your discipline shield is active</p>
-    
+
     <div class="quote-box">
       <p class="quote">"The only way to do great work is to love what you do."</p>
       <p class="author">— Steve Jobs</p>
     </div>
-    
+
     <p class="message">
-      You tried to access a distracting website. Remember, every moment of focus 
+      You tried to access a distracting website. Remember, every moment of focus
       brings you closer to LBSNAA. Your future self will thank you for this discipline.
     </p>
-    
+
     <div class="stats">
       <div class="stat">
         <div class="stat-value" id="blockedCount">0</div>
@@ -157,40 +166,13 @@
         <div class="stat-label">XP Earned</div>
       </div>
     </div>
-    
-    <button class="btn" onclick="goBack()">Return to Study</button>
-    
+
+    <button class="btn" id="backBtn">Return to Study</button>
+
     <p class="timer">Page will redirect in <span id="countdown">10</span> seconds...</p>
   </div>
-  
-  <script>
-    // Load stats
-    chrome.storage.local.get(['stats'], (data) => {
-      const stats = data.stats || {};
-      document.getElementById('blockedCount').textContent = stats.threatsBlocked || 0;
-    });
-    
-    // Countdown timer
-    let seconds = 10;
-    const countdownEl = document.getElementById('countdown');
-    
-    const interval = setInterval(() => {
-      seconds--;
-      countdownEl.textContent = seconds;
-      
-      if (seconds <= 0) {
-        clearInterval(interval);
-        goBack();
-      }
-    }, 1000);
-    
-    function goBack() {
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        window.close();
-      }
-    }
-  </script>
+
+  <script src="blocked.js"></script>
 </body>
+
 </html>
