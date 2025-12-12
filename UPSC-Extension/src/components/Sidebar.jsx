@@ -16,12 +16,12 @@ const Sidebar = ({ user, onShare }) => {
 
             {/* National Emblem & Branding */}
             <div className="flex flex-col items-center py-2 pb-5 border-b border-gray-200 mb-4">
-                <div className="w-24 h-24 flex items-center justify-center mb-3">
-                    <img src="/ashoka-emblem.png" alt="National Emblem" className="w-full h-full object-contain drop-shadow-md" />
+                <div className="w-40 h-40 flex items-center justify-center mb-3">
+                    <img src="/logo.png" alt="National Emblem" className="w-full h-full object-contain drop-shadow-md" />
                 </div>
                 <div className="text-center">
-                    <h1 className="text-2xl font-extrabold tracking-[4px]" style={{ fontFamily: 'Outfit, sans-serif', color: '#1a3a6b' }}>UPSC</h1>
-                    <span className="block text-[0.65rem] font-bold tracking-[4px] mt-1" style={{ fontFamily: 'Outfit, sans-serif', color: '#ff6b00' }}>CONTROL ROOM</span>
+                    <h1 className="text-3xl font-extrabold tracking-[4px]" style={{ fontFamily: 'Outfit, sans-serif', color: '#1a3a6b' }}>UPSC</h1>
+                    <span className="block text-md font-bold tracking-[4px] mt-1 " style={{ fontFamily: 'Outfit, sans-serif', color: '#ff6b00' }}>CONTROL ROOM</span>
                 </div>
             </div>
 
