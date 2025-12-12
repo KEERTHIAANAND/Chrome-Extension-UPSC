@@ -4,6 +4,9 @@
 chrome.storage.local.get(['stats'], (data) => {
     const stats = data.stats || {};
     document.getElementById('blockedCount').textContent = stats.threatsBlocked || 0;
+
+    const disciplineScore = Math.round(stats.disciplineScore || 100);
+    document.getElementById('disciplineScore').textContent = `${disciplineScore}%`;
 });
 
 // Countdown timer
