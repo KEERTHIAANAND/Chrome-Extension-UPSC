@@ -300,6 +300,13 @@ function App() {
             <Bookmarks bookmarks={bookmarks} onAddBookmark={handleAddBookmark} onRemoveBookmark={handleRemoveBookmark} />
             <QuickNotes notes={notes} onSave={handleSaveNotes} />
           </div>
+
+          {/* Footer */}
+          <footer className="text-center py-4 mt-auto border-t border-gray-100">
+            <p className="text-xs text-gray-400">
+              Developed by <a href="https://www.linkedin.com/in/keerthiaanand-k-s/" target="_blank" rel="noopener noreferrer" className="font-bold text-gray-500 hover:text-blue-600 transition-colors">Keerthi Aanand</a>
+            </p>
+          </footer>
         </div>
       </main>
 
