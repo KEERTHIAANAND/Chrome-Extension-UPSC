@@ -24,11 +24,8 @@ const interval = setInterval(() => {
 }, 1000);
 
 function goBack() {
-    if (window.history.length > 1) {
-        window.history.back();
-    } else {
-        window.close();
-    }
+    // Redirect to dashboard (new tab/extension page)
+    window.location.href = chrome.runtime.getURL('index.html');
 }
 
 // Add event listener for the button (CSP compliant - no inline onclick)
