@@ -1,16 +1,39 @@
 import React, { useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 
+// Rank definitions
+const RANKS = [
+    { title: 'Beginner', xp: 0, icon: '🔰' },
+    { title: 'Learner', xp: 1500, icon: '📜' },
+    { title: 'Focused', xp: 5000, icon: '🔥' },
+    { title: 'Dedicated', xp: 15000, icon: '⚔️' },
+    { title: 'Master', xp: 30000, icon: '👑' },
+    { title: 'Champion', xp: 50000, icon: '🏆' },
+];
+
 const ShareModal = ({ isOpen, onClose, user, stats, streak, quote }) => {
     const cardRef = useRef(null);
     const [isSaving, setIsSaving] = useState(false);
 
     if (!isOpen) return null;
 
+    // Get current rank based on XP
+    const getCurrentRank = () => {
+        const currentXP = stats.totalXP || user.currentXP || 0;
+        for (let i = RANKS.length - 1; i >= 0; i--) {
+            if (currentXP >= RANKS[i].xp) {
+                return RANKS[i];
+            }
+        }
+        return RANKS[0];
+    };
+
+    const currentRank = getCurrentRank();
+
     const handleCopyCaption = () => {
         const caption = `🏛️ ROAD TO LBSNAA - Official Daily Report
 
-👑 Rank: ${user.rank?.title || 'Aspirant'} (${user.rank?.abbreviation || 'ASP'})
+${currentRank.icon} Rank: ${currentRank.title}
 🔥 Streak: ${streak} Days | ⭐ XP: ${stats.totalXP || user.currentXP || 0} | 🛡️ Discipline: ${Math.round(stats.disciplineScore || 100)}%
 
 "${quote?.text || 'Consistency is the signature of excellence.'}"
@@ -72,8 +95,8 @@ const ShareModal = ({ isOpen, onClose, user, stats, streak, quote }) => {
                 </button>
 
                 {/* Compact Card */}
-                <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
-                    <div ref={cardRef} style={{ padding: '20px', backgroundColor: '#ffffff' }}>
+                <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', width: '320px', margin: '0 auto' }}>
+                    <div ref={cardRef} style={{ padding: '20px', backgroundColor: '#ffffff', width: '320px', boxSizing: 'border-box' }}>
                         {/* Badge */}
                         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
                             <span style={{
@@ -103,8 +126,8 @@ const ShareModal = ({ isOpen, onClose, user, stats, streak, quote }) => {
 
                         {/* Rank Section */}
                         <div style={{ borderRadius: '16px', padding: '24px', textAlign: 'center', backgroundColor: '#f7f8fa' }}>
-                            {/* Crown Icon Circle */}
-                            <div style={{ position: 'relative', display: 'inline-block', marginBottom: '16px' }}>
+                            {/* Rank Icon Circle */}
+                            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
                                 <div style={{
                                     width: '96px',
                                     height: '96px',
@@ -113,30 +136,31 @@ const ShareModal = ({ isOpen, onClose, user, stats, streak, quote }) => {
                                     border: '4px solid #e8eaed',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    justifyContent: 'center'
+                                    justifyContent: 'center',
+                                    fontSize: '48px',
+                                    lineHeight: '1',
+                                    textAlign: 'center',
+                                    position: 'relative'
                                 }}>
-                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1a3a6b" strokeWidth="1.2">
-                                        <path d="M2 20h20" />
-                                        <path d="M4 20V10l4 4 4-8 4 8 4-4v10" />
-                                    </svg>
-                                </div>
-                                {/* Green Badge */}
-                                <div style={{
-                                    position: 'absolute',
-                                    right: '0',
-                                    top: '8px',
-                                    width: '24px',
-                                    height: '24px',
-                                    borderRadius: '50%',
-                                    backgroundColor: '#10b981',
-                                    border: '2px solid #ffffff',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}>
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3">
-                                        <path d="M20 6L9 17l-5-5" />
-                                    </svg>
+                                    <span style={{ display: 'block', lineHeight: '96px', width: '100%', textAlign: 'center' }}>{currentRank.icon}</span>
+                                    {/* Green Badge */}
+                                    <div style={{
+                                        position: 'absolute',
+                                        right: '0',
+                                        top: '8px',
+                                        width: '24px',
+                                        height: '24px',
+                                        borderRadius: '50%',
+                                        backgroundColor: '#10b981',
+                                        border: '2px solid #ffffff',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}>
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3">
+                                            <path d="M20 6L9 17l-5-5" />
+                                        </svg>
+                                    </div>
                                 </div>
                             </div>
 
@@ -147,7 +171,7 @@ const ShareModal = ({ isOpen, onClose, user, stats, streak, quote }) => {
 
                             {/* Rank Title */}
                             <h3 style={{ fontSize: '20px', fontWeight: '700', color: '#1a3a6b', fontFamily: 'Outfit, sans-serif', marginBottom: '24px', lineHeight: '1.2' }}>
-                                {user.rank?.title || 'Aspirant'} ({user.rank?.abbreviation || 'ASP'})
+                                {currentRank.title}
                             </h3>
 
                             {/* Stats Row */}
@@ -225,7 +249,7 @@ const ShareModal = ({ isOpen, onClose, user, stats, streak, quote }) => {
                     <p className="text-center text-[0.55rem] text-gray-400 pb-3">Share on Instagram & WhatsApp</p>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 
