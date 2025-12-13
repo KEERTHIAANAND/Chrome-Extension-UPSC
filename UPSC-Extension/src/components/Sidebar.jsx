@@ -1,22 +1,48 @@
 import React, { useState } from 'react';
 
+// Rank definitions
+const RANKS = [
+    { title: 'Beginner', xp: 0, icon: '🔰' },
+    { title: 'Learner', xp: 1500, icon: '📜' },
+    { title: 'Focused', xp: 5000, icon: '🔥' },
+    { title: 'Dedicated', xp: 15000, icon: '⚔️' },
+    { title: 'Master', xp: 30000, icon: '👑' },
+    { title: 'Champion', xp: 50000, icon: '🏆' },
+];
+
 const Sidebar = ({ user, onShare }) => {
     const xpPercentage = (user.currentXP / user.targetXP) * 100;
     const [showRules, setShowRules] = useState(false);
+
+    // Get current rank based on XP
+    const getCurrentRank = () => {
+        for (let i = RANKS.length - 1; i >= 0; i--) {
+            if (user.currentXP >= RANKS[i].xp) {
+                return RANKS[i];
+            }
+        }
+        return RANKS[0];
+    };
+
+    const currentRank = getCurrentRank();
+    const nextRankIndex = RANKS.findIndex(r => r.xp > user.currentXP);
+    const nextRank = nextRankIndex !== -1 ? RANKS[nextRankIndex] : null;
 
     return (
         <aside className="w-60 min-h-screen bg-gradient-to-b from-gray-50 to-white border-r border-gray-200 flex flex-col p-4">
             {/* Header with Help */}
             <div className="flex items-center justify-end mb-2">
-                {/* Help/Rules Icon */}
+                {/* Help/Rules Icon - Clipboard with checkmarks */}
                 <button
                     onClick={() => setShowRules(true)}
-                    className="w-8 h-8 bg-white border border-gray-200 rounded-lg flex items-center justify-center cursor-pointer text-gray-500 hover:bg-orange-50 hover:text-orange-500 hover:border-orange-200 transition-all"
+                    className="w-12 h-12 bg-orange-50 border-2 border-orange-200 rounded-xl flex items-center justify-center cursor-pointer text-orange-500 hover:bg-orange-100 hover:border-orange-300 transition-all shadow-sm"
                     title="Dashboard Rules"
                 >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" />
-                        <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2" />
+                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                        <path d="M9 12l2 2 4-4" />
+                        <path d="M9 17h6" />
                     </svg>
                 </button>
             </div>
@@ -36,15 +62,15 @@ const Sidebar = ({ user, onShare }) => {
             <div className="bg-white rounded-2xl p-5 text-center shadow-lg mb-4">
                 <div className="relative inline-block mb-3">
                     <div className="w-20 h-20 rounded-full overflow-hidden border-[3px] border-gray-200 bg-gradient-to-br from-gray-100 to-gray-200">
-                        <img src={user.avatar || '/default-avatar.svg'} alt={user.name} className="w-full h-full object-cover" />
+                        <img src={user.avatar || '/default-avatar.svg'} alt="UPSC Aspirant" className="w-full h-full object-cover" />
                     </div>
                     <div className="absolute bottom-1 right-1 w-3.5 h-3.5 bg-green-500 border-[3px] border-white rounded-full"></div>
                 </div>
-                <h3 className="text-lg font-semibold" style={{ fontFamily: 'Outfit, sans-serif', color: '#1a3a6b' }}>{user.name}</h3>
-                <p className="text-xs text-gray-500">{user.batch}</p>
+                <h3 className="text-lg font-semibold" style={{ fontFamily: 'Outfit, sans-serif', color: '#1a3a6b' }}>UPSC Aspirant</h3>
+                <p className="text-xs text-gray-500">CSE 2026</p>
             </div>
 
-            {/* Rank Card */}
+            {/* Rank Card - Dynamic */}
             <div className="bg-white rounded-2xl p-4 shadow-lg mb-4 text-center">
                 <div className="mb-2">
                     <span className="inline-flex items-center gap-1.5 text-[0.6rem] font-bold tracking-widest uppercase" style={{ color: '#ff6b00' }}>
@@ -54,8 +80,8 @@ const Sidebar = ({ user, onShare }) => {
                         CURRENT RANK
                     </span>
                 </div>
-                <h2 className="text-sm font-bold leading-tight" style={{ fontFamily: 'Outfit, sans-serif', color: '#1a3a6b' }}>{user.rank.title}</h2>
-                <span className="text-xs text-gray-500 font-medium">({user.rank.abbreviation})</span>
+                <div className="text-2xl mb-1">{currentRank.icon}</div>
+                <h2 className="text-sm font-bold leading-tight" style={{ fontFamily: 'Outfit, sans-serif', color: '#1a3a6b' }}>{currentRank.title}</h2>
             </div>
 
             {/* XP Progress */}
@@ -75,9 +101,51 @@ const Sidebar = ({ user, onShare }) => {
                     ></div>
                 </div>
                 <p className="text-xs text-gray-500 mt-3 leading-relaxed">
-                    Earn <strong style={{ color: '#ff6b00' }}>+{(user.targetXP - user.currentXP).toLocaleString()} XP</strong> to unlock<br />
-                    <span className="font-semibold underline cursor-pointer" style={{ color: '#1a3a6b' }}>{user.nextRank}</span> badge.
+                    {nextRank ? (
+                        <>
+                            Earn <strong style={{ color: '#ff6b00' }}>+{(nextRank.xp - user.currentXP).toLocaleString()} XP</strong> to unlock<br />
+                            <span className="font-semibold" style={{ color: '#1a3a6b' }}>{nextRank.icon} {nextRank.title}</span> rank.
+                        </>
+                    ) : (
+                        <span className="font-semibold" style={{ color: '#138808' }}>🏆 You've reached Champion rank!</span>
+                    )}
                 </p>
+            </div>
+
+            {/* Ranks Progression Section */}
+            <div className="bg-white rounded-2xl p-4 shadow-lg mb-4">
+                <div className="flex items-center gap-2 mb-3">
+                    <span className="text-base">🎖️</span>
+                    <h3 className="text-xs font-bold uppercase tracking-wide" style={{ color: '#1a3a6b' }}>Rank Progression</h3>
+                </div>
+                <div className="space-y-1.5">
+                    {RANKS.map((rank, index, arr) => {
+                        const isUnlocked = user.currentXP >= rank.xp;
+                        const isCurrent = isUnlocked && (index === arr.length - 1 || user.currentXP < arr[index + 1].xp);
+                        return (
+                            <div
+                                key={rank.title}
+                                className={`flex items-center gap-2 p-2 rounded-lg transition-all ${isCurrent
+                                    ? 'bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200'
+                                    : isUnlocked
+                                        ? 'bg-green-50 border border-green-100'
+                                        : 'bg-gray-50 border border-gray-100 opacity-50'
+                                    }`}
+                            >
+                                <span className={`text-lg ${!isUnlocked ? 'grayscale' : ''}`}>{rank.icon}</span>
+                                <div className="flex-1">
+                                    <span className={`text-[0.65rem] font-bold ${isCurrent ? 'text-orange-600' : isUnlocked ? 'text-green-600' : 'text-gray-400'}`}>
+                                        {rank.title}
+                                    </span>
+                                    <span className="text-[0.5rem] text-gray-400 ml-1">({rank.xp.toLocaleString()} XP)</span>
+                                </div>
+                                {isCurrent && <span className="text-orange-500 text-xs">◀</span>}
+                                {isUnlocked && !isCurrent && <span className="text-green-500 text-xs">✓</span>}
+                                {!isUnlocked && <span className="text-gray-300 text-xs">🔒</span>}
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
 
             {/* Share Button */}
