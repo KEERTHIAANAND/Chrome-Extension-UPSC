@@ -1,13 +1,25 @@
 // blocked.js - External script for blocked.html (CSP compliant)
 
-// Load stats
-chrome.storage.local.get(['stats'], (data) => {
-    const stats = data.stats || {};
-    document.getElementById('blockedCount').textContent = stats.threatsBlocked || 0;
+// Load stats with error handling
+try {
+    if (chrome.storage && chrome.storage.local) {
+        chrome.storage.local.get(['stats'], (data) => {
+            const stats = data.stats || {};
+            const blockedCountEl = document.getElementById('blockedCount');
+            const disciplineScoreEl = document.getElementById('disciplineScore');
 
-    const disciplineScore = Math.round(stats.disciplineScore || 100);
-    document.getElementById('disciplineScore').textContent = `${disciplineScore}%`;
-});
+            if (blockedCountEl) {
+                blockedCountEl.textContent = stats.threatsBlocked || 0;
+            }
+            if (disciplineScoreEl) {
+                const disciplineScore = Math.round(stats.disciplineScore || 100);
+                disciplineScoreEl.textContent = `${disciplineScore}%`;
+            }
+        });
+    }
+} catch (error) {
+    console.error('Error loading stats:', error);
+}
 
 // Countdown timer
 let seconds = 10;
@@ -25,7 +37,19 @@ const interval = setInterval(() => {
 
 function goBack() {
     // Redirect to dashboard (new tab/extension page)
-    window.location.href = chrome.runtime.getURL('index.html');
+    try {
+        // Check if runtime is available
+        if (chrome.runtime && chrome.runtime.getURL) {
+            window.location.href = chrome.runtime.getURL('index.html');
+        } else {
+            // Fallback to new tab
+            window.location.href = 'chrome://newtab';
+        }
+    } catch (error) {
+        console.error('Error redirecting:', error);
+        // Fallback to new tab
+        window.location.href = 'chrome://newtab';
+    }
 }
 
 // Add event listener for the button (CSP compliant - no inline onclick)
