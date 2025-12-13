@@ -16,13 +16,13 @@ function App() {
   // Source: UPSC Official Calendar
   const UPSC_PRELIMS_2026 = new Date('2026-05-24');
 
-  // User data - empty defaults
+  // User data - defaults
   const [user, setUser] = useState({
-    name: '',
-    batch: '',
+    name: 'UPSC Aspirant',
+    batch: 'CSE 2026',
     avatar: null,
     currentXP: 0,
-    targetXP: 5000,
+    targetXP: 50000,
     nextRank: 'Sub-Divisional Magistrate',
     rank: {
       title: 'Aspirant',
