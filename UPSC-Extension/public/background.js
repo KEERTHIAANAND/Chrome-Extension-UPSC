@@ -38,18 +38,18 @@ chrome.runtime.onInstalled.addListener(async () => {
         focusMinutesBuffer: 0
     });
 
-    // Reset User XP
+    // Reset User XP and ensure targetXP is 50000
     if (data.user) {
-        const resetUser = { ...data.user, currentXP: 0 };
+        const resetUser = { ...data.user, currentXP: 0, targetXP: 50000 };
         await chrome.storage.local.set({ user: resetUser });
     } else {
         await chrome.storage.local.set({
             user: {
                 name: 'UPSC Aspirant',
-                batch: 'CSE 2025',
+                batch: 'CSE 2026',
                 avatar: null,
                 currentXP: 0,
-                targetXP: 5000,
+                targetXP: 50000,
                 nextRank: 'Sub-Divisional Magistrate',
                 rank: {
                     title: 'Aspirant',
