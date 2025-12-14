@@ -41,7 +41,6 @@ UPSC Control Room is a productivity Chrome extension designed for UPSC Civil Ser
 | `alarms` | Track focus time and maintain streaks |
 | `notifications` | Alert you about achievements and blocked sites |
 | `contextMenus` | Enable right-click bookmark feature |
-| `downloads` | Save your progress card as an image |
 | `<all_urls>` | Block distracting sites across all websites |
 
 ## Why We Need `<all_urls>` Permission
