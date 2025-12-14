@@ -2,8 +2,8 @@
     "manifest_version": 3,
     "name": "UPSC Control Room",
     "version": "1.0.0",
-    "description": "A gamified productivity dashboard for UPSC aspirants. Block distractions, track focus, maintain streaks, and stay disciplined on your journey to LBSNAA.",
-    "author": "UPSC Control Room Team",
+    "description": "Gamified productivity dashboard for UPSC aspirants. Block distractions, track focus, build streaks for LBSNAA.",
+    "author": "Keerthi Aanand K S",
     "action": {
         "default_popup": "index.html",
         "default_title": "UPSC Control Room",
@@ -25,8 +25,7 @@
         "tabs",
         "alarms",
         "notifications",
-        "contextMenus",
-        "downloads"
+        "contextMenus"
     ],
     "host_permissions": [
         "<all_urls>"
